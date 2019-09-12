@@ -22,6 +22,8 @@ class _SplashPageState extends State<SplashPage> {
     return SplashScreen.callback(
       name: 'assets/splash.flr', // flr動畫檔路徑
       onSuccess: (_){_authenticationBloc.dispatch(AppStarted());}, // 動畫結束後觸發AppStarted事件
+//      onError: (error, stack){
+//        _authenticationBloc.dispatch(AppStarted());},
       until: () => Future.delayed(Duration(seconds: 3)), //等待3秒
       startAnimation: 'rotate_scale_color', // 動畫名稱
     );
