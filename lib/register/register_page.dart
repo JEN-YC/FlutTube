@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../firebase/user_repository.dart';
+import 'register.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegisterPage extends StatelessWidget {
   final UserRepository _userRepository;
@@ -10,9 +12,11 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text('Register Page'),
-      ),
-    );
+        backgroundColor: Colors.white,
+        body: BlocProvider(
+          builder: (BuildContext content) =>
+              RegisterBloc(userRepository: _userRepository),
+          child: RegisterForm(),
+        ));
   }
 }

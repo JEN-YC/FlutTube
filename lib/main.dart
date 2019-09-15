@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bloc/bloc.dart';
-
+import 'home/home_page.dart';
 import 'splash_page.dart';
 import 'simple_bloc_delegate.dart';
 import 'firebase/user_repository.dart';
 import 'authentication_bloc/bloc.dart';
 import 'login/login_page.dart';
 
-void main(){
+void main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
   runApp(MyApp());
 }
@@ -31,22 +31,22 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      builder: (BuildContext context) => _authenticationBloc,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: BlocBuilder(
-          bloc: _authenticationBloc,
-          builder: (context, state){
-            if (state is Authenticated){
-              return Center(child:Text('Home Page'));
-            }else if (state is Unauthenticated) {
-              return LoginPage(userRepository: _userRepository,);
-            }
-            return SplashPage();
-          },
-        ),
-      )
-    );
+        builder: (BuildContext context) => _authenticationBloc,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: BlocBuilder(
+            bloc: _authenticationBloc,
+            builder: (context, state) {
+              if (state is Authenticated) {
+                return HomePage();
+              } else if (state is Unauthenticated) {
+                return LoginPage(
+                  userRepository: _userRepository,
+                );
+              }
+              return SplashPage();
+            },
+          ),
+        ));
   }
 }
-
