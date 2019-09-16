@@ -4,6 +4,7 @@ import 'login.dart';
 import '../firebase/user_repository.dart';
 import 'package:fluttube/authentication_bloc/bloc.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatefulWidget {
   final UserRepository _userRepository;
@@ -20,7 +21,7 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   LoginBloc _loginBloc;
-
+  bool _rememberAccount;
   UserRepository get _userRepository => widget._userRepository;
   bool get isPopulated =>
       _emailController.text.isNotEmpty && _passwordController.text.isNotEmpty;
@@ -33,9 +34,34 @@ class _LoginFormState extends State<LoginForm> {
     _loginBloc = BlocProvider.of<LoginBloc>(context);
     _emailController.addListener(_onEmailChanged);
     _passwordController.addListener(_onPasswordChanged);
+    _loadCheckbox();
+    _loadAccount();
     super.initState();
   }
 
+  _loadCheckbox() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberAccount = prefs.getBool('remember_account');
+    });
+  }
+
+  _saveCheckout(value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember_account', value);
+  }
+
+  _loadAccount() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _emailController.text = prefs.getString('account') ?? "";
+    });
+  }
+
+  _saveAccount(account) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('account', account);
+  }
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
@@ -64,6 +90,8 @@ class _LoginFormState extends State<LoginForm> {
             )));
         }
         if (state.isSuccess) {
+          if(_rememberAccount)
+            _saveAccount(_emailController.text);
           BlocProvider.of<AuthenticationBloc>(context).dispatch(LoggedIn());
         }
       },
@@ -102,6 +130,17 @@ class _LoginFormState extends State<LoginForm> {
                       return !state.isPasswordValid ? 'Invalid Password' : null;
                     },
                   ),
+                  CheckboxListTile(
+                    value: _rememberAccount ?? false,
+                    onChanged: (value){
+                      setState(() {
+                        _rememberAccount = value;
+                      });
+                      _saveCheckout(value);
+                    },
+                    title: Text('記住我的帳號'),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 20.0),
                     child: Column(
@@ -111,7 +150,6 @@ class _LoginFormState extends State<LoginForm> {
                             onPressed: isLoginButtonEnabled(state)
                                 ? _onFormSubmitted
                                 : null),
-
                         GoogleSignInButton(
                           onPressed: () =>
                               _loginBloc.dispatch(LoginWithGooglePressed()),
