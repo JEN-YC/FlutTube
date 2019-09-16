@@ -2,13 +2,20 @@ import 'package:http/http.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'model/movie_list.dart';
+import '../secret.dart';
 
 class MovieApiProvider{
   final Client _client = Client();
-  final _apiKey = '980f1ede07f79d95165d87ce1c55ed16';
   final _baseUrl = 'http://api.themoviedb.org/3/movie';
 
+  Future<String> getKey() async{
+    Secret secret = await SecretLoader(secretPath: 'assets/secrets.json').load();
+    return secret.movieApiKey;
+  }
+
+
   Future<MovieList> fetchPopularMovieList({String region='TW'}) async {
+    final _apiKey = await getKey();
     final response = await _client.get(
       "$_baseUrl/popular?api_key=$_apiKey&page=1&region=$region");
     if (response.statusCode == 200) {
@@ -20,6 +27,7 @@ class MovieApiProvider{
   }
 
   Future<MovieList> fetchNowPlayingMovieList({String region='TW'}) async {
+    final _apiKey = await getKey();
     final response = await _client.get(
         "$_baseUrl/now_playing?api_key=$_apiKey&page=1&region=$region");
     if (response.statusCode == 200) {
@@ -31,6 +39,7 @@ class MovieApiProvider{
   }
 
   Future<MovieList> fetchTopRatedMovieList({String region='TW'}) async {
+    final _apiKey = await getKey();
     final response = await _client.get(
         "$_baseUrl/top_rated?api_key=$_apiKey&page=1&region=$region");
     if (response.statusCode == 200) {
