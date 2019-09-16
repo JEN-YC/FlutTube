@@ -17,7 +17,7 @@ class MovieList {
     _results = temp;
   }
 
-  List<_Item> get movieList => _results;
+  List<_Item> get results => _results;
   int get totalPages => _totalPages;
   int get totalResults => _totalResults;
   int get page => _page;
