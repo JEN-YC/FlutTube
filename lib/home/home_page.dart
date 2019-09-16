@@ -43,12 +43,16 @@ class _MovieListState extends State<MovieList> {
           return Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is FailedFetchData){
-          return Center(child: Text('Failed'),);
-        }else if (state is InitMovieState){
-          return Center(child: Text('Init Movie'),);
+        } else if (state is FailedFetchData) {
+          return Center(
+            child: Text('Failed'),
+          );
+        } else if (state is InitMovieState) {
+          return Center(
+            child: Text('Init Movie'),
+          );
         }
-          return buildList(state.movieList);
+        return buildList(state.movieList);
       },
     );
   }

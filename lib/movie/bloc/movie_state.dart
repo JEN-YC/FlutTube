@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import '../model/movie_list.dart';
 
 @immutable
 abstract class MovieState extends Equatable {
@@ -7,7 +8,7 @@ abstract class MovieState extends Equatable {
 }
 
 class NowPlayingMovieState extends MovieState {
-  final movieList;
+  final MovieList movieList;
   NowPlayingMovieState({@required this.movieList}) : super([movieList]);
 
   @override
@@ -17,7 +18,7 @@ class NowPlayingMovieState extends MovieState {
 }
 
 class PopularMovieState extends MovieState {
-  final movieList;
+  final MovieList movieList;
   PopularMovieState({@required this.movieList}) : super([movieList]);
 
   @override
@@ -27,7 +28,7 @@ class PopularMovieState extends MovieState {
 }
 
 class TopRatedMovieState extends MovieState {
-  final movieList;
+  final MovieList movieList;
   TopRatedMovieState({@required this.movieList}) : super([movieList]);
 
   @override
