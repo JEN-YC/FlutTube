@@ -13,7 +13,7 @@ class NowPlayingMovieState extends MovieState {
 
   @override
   String toString() {
-    return "NowPlayingMovieState";
+    return "NowPlayingMovieState ${movieList.toString()}";
   }
 }
 

@@ -10,7 +10,7 @@ class MovieList {
     _totalResults = parsedJson['total_results'];
 
     List<_Item> temp = [];
-    for (int i=0; i < parsedJson['results'].length; i++){
+    for (int i = 0; i < parsedJson['results'].length; i++) {
       _Item item = _Item(parsedJson['results'][i]);
       temp.add(item);
     }
@@ -21,6 +21,16 @@ class MovieList {
   int get totalPages => _totalPages;
   int get totalResults => _totalResults;
   int get page => _page;
+
+  @override
+  String toString() {
+    return '''MovieList {
+      page: $page,
+      totalPages: $totalPages,
+      totalResult: $totalResults,
+      results: ${results.toString()},
+    }''';
+  }
 }
 
 class _Item {
@@ -61,4 +71,14 @@ class _Item {
   String get language => _language;
   String get overview => _overview;
   String get releaseDate => _releaseDate;
+
+  @override
+  String toString(){
+    return '''_Item{
+      id: $id,
+      title: $title,
+      posterPath: $posterPath,
+      overview: $overview
+    }''';
+  }
 }

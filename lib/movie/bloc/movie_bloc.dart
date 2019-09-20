@@ -31,7 +31,6 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
     try {
       final _movieList =
           await _movieRepository.fetchNowPlayingMovieList(region: region);
-      print(_movieList.results.length);
       yield NowPlayingMovieState(movieList: _movieList);
     } catch (_) {
       yield FailedFetchData();
