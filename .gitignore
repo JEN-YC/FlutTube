@@ -73,4 +73,4 @@
 
 
 # secret
-assets/secrets.json
+lib/movie/movie_api_key.dart
