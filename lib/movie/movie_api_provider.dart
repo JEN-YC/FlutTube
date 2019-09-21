@@ -13,7 +13,7 @@ class MovieApiProvider {
 
   Future<MovieList> fetchPopularMovieList({String region = 'TW'}) async {
     final response = await _client
-        .get("$_baseUrl/popular?api_key=$_apiKey&page=1&region=$region");
+        .get("$_baseUrl/popular?api_key=$_apiKey&page=1&region=$region&&language=zh");
     if (response.statusCode == 200) {
       return MovieList.fromJson(json.decode(response.body));
     } else {
@@ -23,7 +23,7 @@ class MovieApiProvider {
 
   Future<MovieList> fetchNowPlayingMovieList({String region = 'TW'}) async {
     final response = await _client
-        .get("$_baseUrl/now_playing?api_key=$_apiKey&page=1&region=$region");
+        .get("$_baseUrl/now_playing?api_key=$_apiKey&page=1&region=$region&&language=zh");
     if (response.statusCode == 200) {
       return MovieList.fromJson(json.decode(response.body));
     } else {
@@ -33,7 +33,7 @@ class MovieApiProvider {
 
   Future<MovieList> fetchTopRatedMovieList({String region = 'TW'}) async {
     final response = await _client
-        .get("$_baseUrl/top_rated?api_key=$_apiKey&page=1&region=$region");
+        .get("$_baseUrl/top_rated?api_key=$_apiKey&page=1&region=$region&&language=zh");
     if (response.statusCode == 200) {
       return MovieList.fromJson(json.decode(response.body));
     } else {

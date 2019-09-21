@@ -47,12 +47,12 @@ class _Item {
   String _releaseDate;
 
   _Item(result) {
-    _popularity = result['popularity'];
+    _popularity = result['popularity'].toString();
     _voteCount = result['vote_count'];
     _id = result['id'];
     _video = result['video'];
     _voteAverage = result['vote_average'] + 0.0;
-    _title = result['title'];
+    _title = result['original_title'];
     _posterPath = result['poster_path'];
     _backdropPath = result['backdrop_path'];
     _language = result['original_language'];
