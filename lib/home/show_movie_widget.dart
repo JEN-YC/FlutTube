@@ -1,6 +1,7 @@
 import '../movie/movie.dart';
 import 'package:flutter/material.dart';
 import 'card_scroll_widget.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class ShowMovieWidget extends StatefulWidget {
   final MovieList _movieList;
@@ -29,7 +30,7 @@ class _ShowMovieWidgetState extends State<ShowMovieWidget> {
   @override
   Widget build(BuildContext context) {
     PageController controller =
-    PageController(initialPage: movieList.results.length - 1);
+        PageController(initialPage: movieList.results.length - 1);
     controller.addListener(() {
       setState(() {
         currentPage = controller.page;
@@ -92,18 +93,30 @@ class _ShowMovieWidgetState extends State<ShowMovieWidget> {
                     child: Text(movieList.results[currentPage.round()].title,
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 26.0,
+                            fontSize: 24.0,
                             fontFamily: "SF-Pro-Text-Bold")),
                   ),
                   SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                      "上映日期：${movieList.results[currentPage.round()].releaseDate}",
-                      style: TextStyle(
+                    width: 250.0,
+                    child: FadeAnimatedTextKit(
+                      onTap: () {
+                        print("Tap Event");
+                      },
+                      text: [
+                        "上映日期：${movieList.results[currentPage.round()].releaseDate}",
+                        "平均分數：${movieList.results[currentPage.round()].voteAverage}",
+                        "大綱：${movieList.results[currentPage.round()].overview.length < 30 ? movieList.results[currentPage.round()].overview : movieList.results[currentPage.round()].overview.substring(0, 30)}...",
+                        "點擊看更多資訊"
+                      ],
+                      textStyle: TextStyle(
                           color: Colors.amberAccent,
-                          fontSize: 10.0,
-                          fontFamily: "SF-Pro-Text-Regular"))
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.start,
+                      alignment: AlignmentDirectional.center,
+                      duration: Duration(seconds: 5),
+                    ),
+                  ),
                 ],
               )),
         ],

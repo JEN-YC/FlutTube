@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
             bloc: _authenticationBloc,
             builder: (context, state) {
               if (state is Authenticated) {
-                return HomePage();
+                return HomePage(email: state.userName,);
               } else if (state is Unauthenticated) {
                 return LoginPage(
                   userRepository: _userRepository,
