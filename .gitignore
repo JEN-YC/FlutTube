@@ -72,3 +72,4 @@
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
 lib/movie/movie_api_key.dart
+lib/youtube/youtube_api_key.dart
