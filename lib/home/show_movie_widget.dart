@@ -2,6 +2,7 @@ import '../movie/movie.dart';
 import 'package:flutter/material.dart';
 import 'card_scroll_widget.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'detail_page.dart';
 
 class ShowMovieWidget extends StatefulWidget {
   final MovieList _movieList;
@@ -49,13 +50,21 @@ class _ShowMovieWidgetState extends State<ShowMovieWidget> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(category,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 40.0,
-                      fontFamily: "Calibre-Semibold",
-                      letterSpacing: 1.0,
-                    )),
+                SizedBox(
+                  child: TypewriterAnimatedTextKit(
+                      text: [
+                        category,
+                      ],
+                      isRepeatingAnimation: false,
+                      textStyle: TextStyle(
+                          fontSize: 34.0,
+                          fontFamily: "Calibre-Semibold",
+                          color: Colors.white),
+                      textAlign: TextAlign.start,
+                      alignment:
+                          AlignmentDirectional.topStart // or Alignment.topLeft
+                      ),
+                ),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Image.asset(
@@ -96,27 +105,21 @@ class _ShowMovieWidgetState extends State<ShowMovieWidget> {
                             fontSize: 24.0,
                             fontFamily: "SF-Pro-Text-Bold")),
                   ),
-                  SizedBox(
-                    width: 250.0,
-                    child: FadeAnimatedTextKit(
-                      onTap: () {
-                        print("Tap Event");
-                      },
-                      text: [
-                        "上映日期：${movieList.results[currentPage.round()].releaseDate}",
-                        "平均分數：${movieList.results[currentPage.round()].voteAverage}",
-                        "大綱：${movieList.results[currentPage.round()].overview.length < 30 ? movieList.results[currentPage.round()].overview : movieList.results[currentPage.round()].overview.substring(0, 30)}...",
-                        "點擊看更多資訊"
-                      ],
-                      textStyle: TextStyle(
-                          color: Colors.amberAccent,
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.start,
-                      alignment: AlignmentDirectional.center,
-                      duration: Duration(seconds: 5),
-                    ),
-                  ),
+                  GestureDetector(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyHomePage(title: '123'))),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          '點擊看更多細節與預告片',
+                          style: TextStyle(
+                              color: Colors.amberAccent,
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )),
                 ],
               )),
         ],

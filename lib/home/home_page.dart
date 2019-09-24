@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttube/movie/movie.dart';
 import 'show_movie_widget.dart';
 
+
 class HomePage extends StatefulWidget {
   final String email;
   HomePage({Key key, this.email}) : super(key: key);
@@ -125,6 +126,7 @@ class SideDrawer extends StatelessWidget {
             UserAccountsDrawerHeader(
               currentAccountPicture: Image.asset('assets/no.jpg'),
               accountEmail: Text(email),
+              accountName: Text(''),
               decoration: BoxDecoration(color: Colors.brown),
             ),
             ListTile(

@@ -42,7 +42,7 @@ class _LoginFormState extends State<LoginForm> {
   _loadCheckbox() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _rememberAccount = prefs.getBool('remember_account');
+      _rememberAccount = prefs.getBool('remember_account') ?? false;
     });
   }
 
