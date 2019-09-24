@@ -2,7 +2,7 @@ import '../movie/movie.dart';
 import 'package:flutter/material.dart';
 import 'card_scroll_widget.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'detail_page.dart';
+import 'movie_detail_page.dart';
 
 class ShowMovieWidget extends StatefulWidget {
   final MovieList _movieList;
@@ -94,34 +94,46 @@ class _ShowMovieWidgetState extends State<ShowMovieWidget> {
             ],
           ),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MovieDetailPage(
+                            posterPath: movieList
+                                .results[currentPage.round()].backdropPath,
+                            overview:
+                                movieList.results[currentPage.round()].overview,
+                            title: movieList.results[currentPage.round()].title,
+                            releaseDate: movieList
+                                .results[currentPage.round()].releaseDate,
+                            voteAverage: movieList
+                                .results[currentPage.round()].voteAverage,
+                            movieId: movieList.results[currentPage.round()].id,
+                          ))),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  FittedBox(
-                    child: Text(movieList.results[currentPage.round()].title,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24.0,
-                            fontFamily: "SF-Pro-Text-Bold")),
-                  ),
-                  GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MyHomePage(title: '123'))),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: Text(
-                          '點擊看更多細節與預告片',
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FittedBox(
+                      child: Text(movieList.results[currentPage.round()].title,
                           style: TextStyle(
-                              color: Colors.amberAccent,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      )),
-                ],
-              )),
+                              color: Colors.white,
+                              fontSize: 24.0,
+                              fontFamily: "SF-Pro-Text-Bold")),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        '點擊看更多細節與預告片',
+                        style: TextStyle(
+                            color: Colors.amberAccent,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ]),
+            ),
+          ),
         ],
       ),
     );
