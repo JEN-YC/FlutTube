@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../youtube/youtube.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube_api/youtube_api.dart';
+import '../youtube/youtube_player_dialog.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final posterPath;
@@ -169,15 +169,22 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
 }
 
 Widget trailerLayout(List<YT_API> videos) {
-  if (videos.length > 1) {
+  if (videos.length > 0) {
     return GridView.builder(
-      itemCount: videos.length,
+      itemCount: videos.length > 4 ? 4 : videos.length,
       gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
       itemBuilder: (context, index) {
         return Column(
           children: <Widget>[
-            Image.network(videos[index].thumbnail['default']['url']),
+            GestureDetector(
+              child: Image.network(videos[index].thumbnail['default']['url']),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) => YoutubePlayerDialog(
+                        videoUrl: videos[index].id,
+                      )),
+            ),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 130),
               child: Text(
@@ -190,7 +197,12 @@ Widget trailerLayout(List<YT_API> videos) {
         );
       },
     );
-  }else{
-    return Center(child: Text('找尋不到影片...', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),),);
+  } else {
+    return Center(
+      child: Text(
+        '找尋不到影片...',
+        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+      ),
+    );
   }
 }
