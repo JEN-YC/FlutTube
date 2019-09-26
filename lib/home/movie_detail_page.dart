@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../youtube/youtube.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:youtube_api/youtube_api.dart';
-import '../youtube/youtube_player_dialog.dart';
+import 'trailer_widget.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final posterPath;
@@ -50,28 +49,21 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       body: SafeArea(
           top: false,
           bottom: false,
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 200.0,
-                  floating: true,
-                  pinned: false,
-                  elevation: 0.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                      background: Image.network(
-                    "https://image.tmdb.org/t/p/w500$posterPath",
-                    fit: BoxFit.cover,
-                  )),
-                ),
-              ];
-            },
-            body: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+          child: CustomScrollView(slivers: <Widget>[
+            SliverAppBar(
+              expandedHeight: 200.0,
+              floating: false,
+              pinned: false,
+              elevation: 0.0,
+              flexibleSpace: FlexibleSpaceBar(
+                  background: Image.network(
+                "https://image.tmdb.org/t/p/w500$posterPath",
+                fit: BoxFit.cover,
+              )),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
                   Container(margin: EdgeInsets.only(top: 5.0)),
                   Text(
                     title,
@@ -153,56 +145,15 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     bloc: _youtubeBloc,
                     builder: (context, state) {
                       if (state is YoutubeSuccessState) {
-                        return Expanded(
-                          child: trailerLayout(state.ytResult),
-                        );
+                        return trailerWidget(state.ytResult);
                       }
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator(),);
                     },
                   ),
                 ],
               ),
-            ),
-          )),
-    );
-  }
-}
-
-Widget trailerLayout(List<YT_API> videos) {
-  if (videos.length > 0) {
-    return GridView.builder(
-      itemCount: videos.length > 4 ? 4 : videos.length,
-      gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemBuilder: (context, index) {
-        return Column(
-          children: <Widget>[
-            GestureDetector(
-              child: Image.network(videos[index].thumbnail['default']['url']),
-              onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => YoutubePlayerDialog(
-                        videoUrl: videos[index].id,
-                      )),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 130),
-              child: Text(
-                videos[index].title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
             )
-          ],
-        );
-      },
-    );
-  } else {
-    return Center(
-      child: Text(
-        '找尋不到影片...',
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
-      ),
+          ])),
     );
   }
 }
