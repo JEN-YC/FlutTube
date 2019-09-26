@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../youtube/youtube.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:youtube_api/youtube_api.dart';
-import '../youtube/youtube_player_dialog.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'trailer_widget.dart';
+import '../firebase/firestore_database.dart';
+import '../firebase/user_repository.dart';
 
 class MovieDetailPage extends StatefulWidget {
   final posterPath;
@@ -36,13 +35,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   String get movieId => widget.movieId.toString();
 
   bool isOverviewSelected = false;
+  bool isSubmitEnable = false;
   YoutubeBloc _youtubeBloc;
   YoutubeRepository _youtubeRepository;
+  final TextEditingController _inputController = TextEditingController();
   @override
   void initState() {
     _youtubeRepository = YoutubeRepository();
     _youtubeBloc = YoutubeBloc(youtubeRepository: _youtubeRepository);
     _youtubeBloc.dispatch(SearchYoutubeEvent("$title 預告片"));
+    _inputController.addListener(_onInputChanged);
     super.initState();
   }
 
@@ -148,7 +150,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       bloc: _youtubeBloc,
                       builder: (context, state) {
                         if (state is YoutubeSuccessState) {
-                          return trailerLayout(state.ytResult);
+                          return trailerWidget(state.ytResult);
                         }
                         return Center(child: CircularProgressIndicator());
                       },
@@ -162,41 +164,26 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Container(
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: Firestore.instance
-                          .collection('comments')
-                          .where("movie_id", isEqualTo: movieId)
-                          .snapshots(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (!snapshot.hasData)
-                          return const Text('There is no comment right now.');
-                        final int commentCount = snapshot.data.documents.length;
-                        if (commentCount > 0) {
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: commentCount,
-                            itemBuilder: (_, int index) {
-                              final DocumentSnapshot document =
-                                  snapshot.data.documents[index];
-                              return commentWidget(
-                                document['user_email'],
-                                document['content'],
-                                document['time'],
-                              );
-                            },
-                          );
-                        } else {
-                          return Center(
-                            child: Text(
-                              'no comments...',
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          );
-                        }
-                      },
+                  ListTile(
+                    title: TextField(
+                      controller: _inputController,
+                      decoration: InputDecoration(
+                          icon: Icon(Icons.comment), labelText: '留言'),
                     ),
+                    trailing: IconButton(
+                        onPressed: isSubmitEnable
+                            ? () async {
+                                String email =
+                                    await new UserRepository().getUser();
+                                createRecord(
+                                    movieId, email, _inputController.text);
+                                _inputController.clear();
+                              }
+                            : null,
+                        icon: Icon(Icons.subdirectory_arrow_left)),
+                  ),
+                  Container(
+                    child: getComments(movieId),
                   )
                 ]),
               )
@@ -204,89 +191,16 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
           )),
     );
   }
-}
 
-Widget trailerLayout(List<YT_API> videos) {
-  if (videos.length > 0) {
-    return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: videos.length > 4 ? 4 : videos.length,
-      gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemBuilder: (context, index) {
-        return Column(
-          children: <Widget>[
-            GestureDetector(
-              child: Image.network(videos[index].thumbnail['default']['url']),
-              onTap: () => showDialog(
-                  context: context,
-                  builder: (context) => YoutubePlayerDialog(
-                        videoUrl: videos[index].id,
-                      )),
-            ),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 130),
-              child: Text(
-                videos[index].title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            )
-          ],
-        );
-      },
-    );
-  } else {
-    return Center(
-      child: Text(
-        '找尋不到影片...',
-        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
-      ),
-    );
+  void _onInputChanged() {
+    if (_inputController.text.isNotEmpty) {
+      setState(() {
+        isSubmitEnable = true;
+      });
+    } else {
+      setState(() {
+        isSubmitEnable = false;
+      });
+    }
   }
-}
-
-Widget commentWidget(String email, String content, var time) {
-  return Container(
-      padding: EdgeInsets.symmetric(vertical: 5),
-      decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-        color: Colors.black,
-        width: 3.0,
-      ))),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                email,
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold),
-              ),
-              Text(
-                timeago.format(time.toDate()),
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 10.0,
-          ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              content,
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-        ],
-      ));
 }
