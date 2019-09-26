@@ -3,6 +3,8 @@ import '../youtube/youtube.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youtube_api/youtube_api.dart';
 import '../youtube/youtube_player_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class MovieDetailPage extends StatefulWidget {
   final posterPath;
@@ -36,11 +38,13 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   bool isOverviewSelected = false;
   YoutubeBloc _youtubeBloc;
   YoutubeRepository _youtubeRepository;
+  Firestore _firestore;
   @override
   void initState() {
     _youtubeRepository = YoutubeRepository();
     _youtubeBloc = YoutubeBloc(youtubeRepository: _youtubeRepository);
     _youtubeBloc.dispatch(SearchYoutubeEvent("$title 預告片"));
+    _firestore = Firestore.instance;
     super.initState();
   }
 
@@ -57,7 +61,6 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                 SliverAppBar(
                   expandedHeight: 200.0,
                   floating: true,
-                  pinned: false,
                   elevation: 0.0,
                   flexibleSpace: FlexibleSpaceBar(
                       background: Image.network(
@@ -149,17 +152,63 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     ),
                   ),
                   Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                  BlocBuilder(
-                    bloc: _youtubeBloc,
-                    builder: (context, state) {
-                      if (state is YoutubeSuccessState) {
-                        return Expanded(
-                          child: trailerLayout(state.ytResult),
-                        );
-                      }
-                      return CircularProgressIndicator();
-                    },
+                  Flexible(
+                    flex: 9,
+                    child: BlocBuilder(
+                      bloc: _youtubeBloc,
+                      builder: (context, state) {
+                        if (state is YoutubeSuccessState) {
+                          return trailerLayout(state.ytResult);
+                        }
+                        return Center(child: CircularProgressIndicator());
+                      },
+                    ),
                   ),
+                  Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
+                  Text(
+                    "Comments",
+                    style: TextStyle(
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Flexible(
+                    flex: 4,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: Firestore.instance
+                          .collection('comments')
+                          .where("movie_id", isEqualTo: movieId)
+                          .snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (!snapshot.hasData)
+                          return const Text('There is no comment right now.');
+                        final int commentCount = snapshot.data.documents.length;
+                        if (commentCount > 0) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: commentCount,
+                            itemBuilder: (_, int index) {
+                              final DocumentSnapshot document =
+                                  snapshot.data.documents[index];
+                              return commentWidget(
+                                document['user_email'],
+                                document['content'],
+                                document['time'],
+                              );
+                            },
+                          );
+                        } else {
+                          return Center(
+                            child: Text(
+                              'no comments...',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  )
                 ],
               ),
             ),
@@ -171,6 +220,8 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
 Widget trailerLayout(List<YT_API> videos) {
   if (videos.length > 0) {
     return GridView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
       itemCount: videos.length > 4 ? 4 : videos.length,
       gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
@@ -205,4 +256,39 @@ Widget trailerLayout(List<YT_API> videos) {
       ),
     );
   }
+}
+
+Widget commentWidget(String email, String content, var time) {
+  return Container(
+      child: Column(
+    children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            email,
+            style: TextStyle(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            timeago.format(time.toDate()),
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+      SizedBox(
+        height: 10.0,
+      ),
+      Align(
+        alignment: Alignment.topLeft,
+        child: Text(
+          content,
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    ],
+  ));
 }
