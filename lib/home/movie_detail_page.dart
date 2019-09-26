@@ -38,13 +38,11 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   bool isOverviewSelected = false;
   YoutubeBloc _youtubeBloc;
   YoutubeRepository _youtubeRepository;
-  Firestore _firestore;
   @override
   void initState() {
     _youtubeRepository = YoutubeRepository();
     _youtubeBloc = YoutubeBloc(youtubeRepository: _youtubeRepository);
     _youtubeBloc.dispatch(SearchYoutubeEvent("$title 預告片"));
-    _firestore = Firestore.instance;
     super.initState();
   }
 
@@ -54,27 +52,20 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       body: SafeArea(
           top: false,
           bottom: false,
-          child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 200.0,
-                  floating: true,
-                  elevation: 0.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                      background: Image.network(
-                    "https://image.tmdb.org/t/p/w500$posterPath",
-                    fit: BoxFit.cover,
-                  )),
-                ),
-              ];
-            },
-            body: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                expandedHeight: 200.0,
+                floating: false,
+                elevation: 0.0,
+                flexibleSpace: FlexibleSpaceBar(
+                    background: Image.network(
+                  "https://image.tmdb.org/t/p/w500$posterPath",
+                  fit: BoxFit.cover,
+                )),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
                   Container(margin: EdgeInsets.only(top: 5.0)),
                   Text(
                     title,
@@ -152,8 +143,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                     ),
                   ),
                   Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                  Flexible(
-                    flex: 9,
+                  Container(
                     child: BlocBuilder(
                       bloc: _youtubeBloc,
                       builder: (context, state) {
@@ -172,8 +162,7 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Flexible(
-                    flex: 4,
+                  Container(
                     child: StreamBuilder<QuerySnapshot>(
                       stream: Firestore.instance
                           .collection('comments')
@@ -209,9 +198,9 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                       },
                     ),
                   )
-                ],
-              ),
-            ),
+                ]),
+              )
+            ],
           )),
     );
   }
@@ -260,35 +249,44 @@ Widget trailerLayout(List<YT_API> videos) {
 
 Widget commentWidget(String email, String content, var time) {
   return Container(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+          border: Border(
+              bottom: BorderSide(
+        color: Colors.black,
+        width: 3.0,
+      ))),
       child: Column(
-    children: <Widget>[
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            email,
-            style: TextStyle(
-                fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                email,
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold),
+              ),
+              Text(
+                timeago.format(time.toDate()),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
-          Text(
-            timeago.format(time.toDate()),
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey,
+          SizedBox(
+            height: 10.0,
+          ),
+          Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              content,
+              style: TextStyle(fontSize: 16),
             ),
           ),
         ],
-      ),
-      SizedBox(
-        height: 10.0,
-      ),
-      Align(
-        alignment: Alignment.topLeft,
-        child: Text(
-          content,
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    ],
-  ));
+      ));
 }
