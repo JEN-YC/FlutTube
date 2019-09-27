@@ -27,9 +27,6 @@ dependencies:
   timeago: ^2.0.19
   firebase_storage: ^3.0.6
   image_picker: ^0.6.1+4
-  permission_handler: ^3.2.2
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

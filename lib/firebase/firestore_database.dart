@@ -52,3 +52,18 @@ void createRecord(String movieId, String email, String content) async {
     'time': Timestamp.now()
   });
 }
+
+Future<String> getProfilePictureUrl(String email) async {
+  var doc = await Firestore.instance.collection('Users').document(email).get();
+  if (doc.exists) {
+    return doc.data['profile_picture_url'];
+  }
+  return '';
+}
+
+void updateProfilePictureUrl(String email, String url) async {
+  print(url);
+  await Firestore.instance.collection("Users").document(email).setData({
+    'profile_picture_url': url,
+  });
+}

@@ -3,10 +3,10 @@ import '../authentication_bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttube/movie/movie.dart';
 import 'show_movie_widget.dart';
-import '../firebase/storage.dart';
+import '../firebase/upload_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
+import '../firebase/firestore_database.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -127,7 +127,21 @@ class SideDrawer extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              currentAccountPicture: Image.network(''),
+              currentAccountPicture: FutureBuilder<String>(
+                future: getProfilePictureUrl(email),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.active:
+                    case ConnectionState.waiting:
+                      return Center(child: CircularProgressIndicator());
+                      break;
+                    case ConnectionState.done:
+                      return Image.network(snapshot.data);
+                  }
+                  return null;
+                },
+              ),
               accountEmail: Text(email),
               accountName: Text(''),
               decoration: BoxDecoration(color: Colors.brown),
@@ -137,22 +151,13 @@ class SideDrawer extends StatelessWidget {
               title: Text('Profile picture'),
               onTap: () async {
                 File image =
-                await ImagePicker.pickImage(source: ImageSource.gallery);
+                    await ImagePicker.pickImage(source: ImageSource.gallery);
                 if (image != null) {
-                  StorageUploadTask task = uploadImage(image, email);
-                  await task.onComplete;
-                  showDialog(context: context,builder: (context){
-                    return AlertDialog(
-                      title: Text('上傳狀態'),
-                      content: Center(child:Text('照片已成功上傳!')),
-                      actions: <Widget>[
-                        FlatButton(
-                          child: Text('OK'),
-                          onPressed: ()=>Navigator.of(context).pop(),
-                        )
-                      ],
-                    );
-                  });
+                  var uploadTask = uploadImage(image, email);
+                  await uploadTask.onComplete;
+                  String url =
+                      await uploadTask.lastSnapshot.ref.getDownloadURL();
+                  updateProfilePictureUrl(email, url);
                 }
               },
             ),
