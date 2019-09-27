@@ -10,9 +10,12 @@ StreamBuilder<QuerySnapshot> getComments(String movieId) {
         .snapshots(),
     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
       if (!snapshot.hasData)
-        return const Text('There is no comment right now.');
+        return Center(
+          child: CircularProgressIndicator(),
+        );
       final int commentCount = snapshot.data.documents.length;
-      snapshot.data.documents.sort((a, b) => b.data['time'].compareTo(a.data['time']));
+      snapshot.data.documents
+          .sort((a, b) => b.data['time'].compareTo(a.data['time']));
       if (commentCount > 0) {
         return ListView.builder(
           physics: NeverScrollableScrollPhysics(),
@@ -28,7 +31,9 @@ StreamBuilder<QuerySnapshot> getComments(String movieId) {
           },
         );
       } else {
-        return Center(
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
+          alignment: Alignment.center,
           child: Text(
             'no comments...',
             style: TextStyle(fontSize: 20),
@@ -47,4 +52,3 @@ void createRecord(String movieId, String email, String content) async {
     'time': Timestamp.now()
   });
 }
-

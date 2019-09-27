@@ -203,4 +203,10 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       });
     }
   }
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
+  }
 }
