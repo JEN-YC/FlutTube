@@ -25,6 +25,9 @@ dependencies:
   youtube_player_flutter: ^4.1.0
   youtube_api: ^0.7.2
   timeago: ^2.0.19
+  firebase_storage: ^3.0.6
+  image_picker: ^0.6.1+4
+  permission_handler: ^3.2.2
 
 
 dev_dependencies:

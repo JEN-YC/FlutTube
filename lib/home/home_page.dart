@@ -3,7 +3,10 @@ import '../authentication_bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttube/movie/movie.dart';
 import 'show_movie_widget.dart';
-
+import '../firebase/storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class HomePage extends StatefulWidget {
   final String email;
@@ -113,7 +116,7 @@ class _HomePageState extends State<HomePage> {
 
 class SideDrawer extends StatelessWidget {
   final String email;
-
+  String imagePath;
   SideDrawer({Key key, this.email}) : super(key: key);
 
   @override
@@ -124,10 +127,34 @@ class SideDrawer extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              currentAccountPicture: Image.asset('assets/no.jpg'),
+              currentAccountPicture: Image.network(''),
               accountEmail: Text(email),
               accountName: Text(''),
               decoration: BoxDecoration(color: Colors.brown),
+            ),
+            ListTile(
+              leading: Icon(Icons.file_upload),
+              title: Text('Profile picture'),
+              onTap: () async {
+                File image =
+                await ImagePicker.pickImage(source: ImageSource.gallery);
+                if (image != null) {
+                  StorageUploadTask task = uploadImage(image, email);
+                  await task.onComplete;
+                  showDialog(context: context,builder: (context){
+                    return AlertDialog(
+                      title: Text('上傳狀態'),
+                      content: Center(child:Text('照片已成功上傳!')),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('OK'),
+                          onPressed: ()=>Navigator.of(context).pop(),
+                        )
+                      ],
+                    );
+                  });
+                }
+              },
             ),
             ListTile(
               leading: Icon(Icons.sentiment_satisfied),
@@ -150,7 +177,8 @@ class SideDrawer extends StatelessWidget {
               title: Text("About"),
               onTap: () {
                 SnackBar snackbar = SnackBar(
-                  content: Text('FlutTube是第十一屆iT邦幫忙鐵人賽的實作專案\n其中使用的電影資料由TMDb所提供'),
+                  content:
+                      Text('FlutTube是第十一屆iT邦幫忙鐵人賽的實作專案\n其中使用的電影資料由TMDb所提供'),
                   duration: Duration(seconds: 5),
                 );
                 Scaffold.of(context).showSnackBar(snackbar);
