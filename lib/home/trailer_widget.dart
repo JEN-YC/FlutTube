@@ -9,7 +9,7 @@ Widget trailerWidget(List<YT_API> videos) {
       shrinkWrap: true,
       itemCount: videos.length > 4 ? 4 : videos.length,
       gridDelegate:
-      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
       itemBuilder: (context, index) {
         return Column(
           children: <Widget>[
@@ -18,8 +18,8 @@ Widget trailerWidget(List<YT_API> videos) {
               onTap: () => showDialog(
                   context: context,
                   builder: (context) => YoutubePlayerDialog(
-                    videoUrl: videos[index].id,
-                  )),
+                        videoUrl: videos[index].id,
+                      )),
             ),
             ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 130),
