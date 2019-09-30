@@ -65,5 +65,11 @@ void updateProfilePictureUrl(String email, String url) async {
   print(url);
   await Firestore.instance.collection("Users").document(email).setData({
     'profile_picture_url': url,
-  });
+  }, merge: true);
+}
+
+void updateUserToken(String email, String token) async {
+  await Firestore.instance.collection("Users").document(email).setData({
+    'fcm_token': token,
+  }, merge: true);
 }

@@ -193,11 +193,11 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
   }
 
   void _onInputChanged() {
-    if (_inputController.text.isNotEmpty) {
+    if (_inputController.text.isNotEmpty && !isSubmitEnable) {
       setState(() {
         isSubmitEnable = true;
       });
-    } else {
+    } else if(_inputController.text.isEmpty && isSubmitEnable){
       setState(() {
         isSubmitEnable = false;
       });

@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
 
 class SideDrawer extends StatelessWidget {
   final String email;
-  String imagePath;
   SideDrawer({Key key, this.email}) : super(key: key);
 
   @override
@@ -137,7 +136,9 @@ class SideDrawer extends StatelessWidget {
                       return Center(child: CircularProgressIndicator());
                       break;
                     case ConnectionState.done:
-                      return Image.network(snapshot.data);
+                      if(snapshot.data != null)
+                        return Image.network(snapshot.data);
+                      return Container();
                   }
                   return null;
                 },
