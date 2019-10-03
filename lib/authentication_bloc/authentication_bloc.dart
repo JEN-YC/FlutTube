@@ -33,6 +33,9 @@ class AuthenticationBloc
         final String name = await _userRepository.getUser();
         yield Authenticated(name);
       }
+      else{
+        yield Unauthenticated();
+      }
     } catch (_) {
       yield Unauthenticated();
     }
