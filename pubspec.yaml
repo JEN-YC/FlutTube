@@ -34,6 +34,14 @@ dev_dependencies:
     sdk: flutter
   test: any
   mockito: ^4.1.1
+  flutter_launcher_icons: ^0.7.3
+
+flutter_icons:
+  image_path: "assets/icons/ic_launcher.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+
+
 
 flutter:
   uses-material-design: true

@@ -73,3 +73,5 @@
 
 lib/movie/movie_api_key.dart
 lib/youtube/youtube_api_key.dart
+android/key.properties
+*.apk
